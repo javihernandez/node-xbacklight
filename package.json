@@ -1,0 +1,20 @@
+{
+  "name": "xbacklight",
+  "description": "NodeJS wrapper for xbacklight.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/GPII/node-xbacklight",
+  "repository": "git://github.com/GPII/node-xbacklight.git",
+  "dependencies": {},
+  "license" : "BSD-3-Clause",
+  "keywords": [
+      "xbacklight",
+      "linux",
+      "brightness",
+      "configuration"
+  ]
+  "main": "./build/Release/xbacklight.node",
+  "scripts": {
+    "install": "node-gyp configure build"
+  },
+  "engines": { "node" : ">= 0.8.0" }
+}

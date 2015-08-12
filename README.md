@@ -1,5 +1,5 @@
 # node-xbacklight
-Node.js binding to GNU/Linux xbacklight command line utility
+Node.js binding to GNU/Linux xbacklight command line utility, the code was originally copied from http://cgit.freedesktop.org/xorg/app/xbacklight.
 
 ## Getting started
 

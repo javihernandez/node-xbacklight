@@ -11,7 +11,7 @@
       "linux",
       "brightness",
       "configuration"
-  ]
+  ],
   "main": "./build/Release/xbacklight.node",
   "scripts": {
     "install": "node-gyp configure build"

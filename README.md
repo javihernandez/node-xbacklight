@@ -33,7 +33,7 @@ In addition to the regular requirements for creating a NodeJS addon, we depend o
 * __xcb__: XCB - X-protocol C Binding
 * __xcb-atom__: XCB Atom library - XCB atom cache
 * __xcb-aux__: XCB Aux library - XCB convenient functions
-* __xcb-randr >= 1.2)__: XCB RandR - XCB RandR Extension
+* __xcb-randr >= 1.2__: XCB RandR - XCB RandR Extension
 
 ## API
 

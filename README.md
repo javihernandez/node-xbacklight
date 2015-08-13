@@ -27,6 +27,14 @@ Load the module:
 
 ```var xbacklight = require("build/Release/xbacklight.node");```
 
+### Build dependencies
+
+In addition to the regular requirements for creating a NodeJS addon, pkg-config must be satisfied by having the following:
+* xcb: XCB - X-protocol C Binding
+* xcb-atom: XCB Atom library - XCB atom cache
+* xcb-aux: XCB Aux library - XCB convenient functions
+* xcb-randr >= 1.2: XCB RandR - XCB RandR Extension
+
 ## API
 
 Right now it only supports simple calls to _get_ and _set_, but it'll be improved to support the rest of options that the original _xbacklight_ command-line utility supports.

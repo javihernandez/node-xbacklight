@@ -29,18 +29,18 @@ Load the module:
 
 ### Build dependencies
 
-In addition to the regular requirements for creating a NodeJS addon, pkg-config must be satisfied by having the following:
-* xcb: XCB - X-protocol C Binding
-* xcb-atom: XCB Atom library - XCB atom cache
-* xcb-aux: XCB Aux library - XCB convenient functions
-* xcb-randr >= 1.2: XCB RandR - XCB RandR Extension
+In addition to the regular requirements for creating a NodeJS addon, we depend on:
+* __xcb__: XCB - X-protocol C Binding
+* __xcb-atom__: XCB Atom library - XCB atom cache
+* __xcb-aux__: XCB Aux library - XCB convenient functions
+* __xcb-randr >= 1.2)__: XCB RandR - XCB RandR Extension
 
 ## API
 
 Right now it only supports simple calls to _get_ and _set_, but it'll be improved to support the rest of options that the original _xbacklight_ command-line utility supports.
 
-* get - Returns the current value of xbacklight
-* set - Set the value for xbacklight
+* __get__ - Returns the current value of xbacklight
+* __set__ - Set the value for xbacklight
   * int value - Value range is 0-100
 
 ## Contributing

@@ -33,7 +33,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <iostream>
+#include <sstream>
+#include <node.h>
+
 #include "xcb.h"
+
+using namespace v8;
 
 static xcb_atom_t backlight, backlight_new, backlight_legacy;
 
@@ -65,17 +71,23 @@ _get_xcb_data () {
     data.ver_cookie = xcb_randr_query_version (data.conn, 1, 2);
     data.ver_reply = xcb_randr_query_version_reply (data.conn, data.ver_cookie, &data.error);
     if (data.error != NULL || data.ver_reply == NULL) {
-	int ec = data.error ? data.error->error_code : -1;
-	fprintf (stderr, "RANDR Query Version returned error %d\n", ec);
-        // Throw an error instead
-	exit (1);
+        std::ostringstream err_msg;
+        int ec = data.error ? data.error->error_code : -1;
+
+        err_msg << "RANDR Query Version returned error " << ec;
+        std::string err_str = err_msg.str();
+        ThrowException(Exception::Error(
+            String::New(err_str.c_str())));
     }
     if (data.ver_reply->major_version != 1 ||
 	data.ver_reply->minor_version < 2) {
-	fprintf (stderr, "RandR version %d.%d too old\n",
-		 data.ver_reply->major_version, data.ver_reply->minor_version);
-        // Throw an error instead
-	exit (1);
+
+        std::ostringstream err_msg;
+
+        err_msg << "RANDR version " << data.ver_reply->major_version << "." << data.ver_reply->minor_version << " too old.";
+        std::string err_str = err_msg.str();
+        ThrowException(Exception::Error(
+            String::New(err_str.c_str())));
     }
     free (data.ver_reply);
 
@@ -84,10 +96,13 @@ _get_xcb_data () {
 
     data.backlight_reply = xcb_intern_atom_reply (data.conn, data.backlight_cookie[0], &data.error);
     if (data.error != NULL || data.backlight_reply == NULL) {
+        std::ostringstream err_msg;
+
 	int ec = data.error ? data.error->error_code : -1;
-	fprintf (stderr, "Intern Atom returned error %d\n", ec);
-        // Throw an error instead
-	exit (1);
+        err_msg << "Intern Atom returned error " << ec;
+        std::string err_str = err_msg.str();
+        ThrowException(Exception::Error(
+            String::New(err_str.c_str())));
     }
 
     backlight_new = data.backlight_reply->atom;
@@ -95,19 +110,22 @@ _get_xcb_data () {
 
     data.backlight_reply = xcb_intern_atom_reply (data.conn, data.backlight_cookie[1], &data.error);
     if (data.error != NULL || data.backlight_reply == NULL) {
+        std::ostringstream err_msg;
+
 	int ec = data.error ? data.error->error_code : -1;
-	fprintf (stderr, "Intern Atom returned error %d\n", ec);
-        // Throw an error instead
-	exit (1);
+        err_msg << "Intern Atom returned error " << ec;
+        std::string err_str = err_msg.str();
+        ThrowException(Exception::Error(
+            String::New(err_str.c_str())));
     }
 
     backlight_legacy = data.backlight_reply->atom;
     free (data.backlight_reply);
 
     if (backlight_new == XCB_NONE && backlight_legacy == XCB_NONE) {
-	fprintf (stderr, "No outputs have backlight property\n");
-        // Throw an error instead
-	exit (1);
+        std::string err_str ("No outputs have backlight property");
+        ThrowException(Exception::Error(
+            String::New(err_str.c_str())));
     }
 
     data.iter = xcb_setup_roots_iterator (xcb_get_setup (data.conn));

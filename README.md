@@ -1,5 +1,21 @@
 # node-xbacklight
-Node.js binding to GNU/Linux xbacklight command line utility, the code was originally copied from http://cgit.freedesktop.org/xorg/app/xbacklight.
+Node.js port of GNU/Linux' [Xbacklight](http://cgit.freedesktop.org/xorg/app/xbacklight) command line utility.
+
+Xbacklight is used to adjust the backlight brightness where supported.
+It uses the RandR extension to find all outputs on the X server
+supporting backlight brightness control and changes them all in the
+same way.
+
+With Xbacklight you can:
+* Get the current backlight brightness.
+* Set the backlight brightness to the specified level.
+* Increase and decrease the brightness by the specified amount.
+
+Take into account that the brightness value is always represented as a percentage of the maximum brightness supported.
+
+When setting a new value, you can also specify:
+* The number of steps to take while fading. Default is 20.
+* Length of time to spend fading the backlight between old and new value.  Default is 200 ms.
 
 ## Getting started
 
@@ -37,16 +53,28 @@ In addition to the regular requirements for creating a NodeJS addon, we depend o
 
 ## API
 
-Right now it only supports simple calls to _get_ and _set_, but it'll be improved to support the rest of options that the original _xbacklight_ command-line utility supports.
-
-* __get__ - Returns the current value of xbacklight
+* __get__ - Get the current value of xbacklight
 * __set__ - Set the value for xbacklight
-  * int value - Value range is 0-100
+  * value - Value range is 0-100
+  * steps - Number of steps
+  * time  - Time in ms
+* __inc__ - Increase the value
+  * value - Value range is 0-100
+  * steps - Number of steps
+  * time  - Time in ms
+* __dec__ - Decrease the value
+  * value - Value range is 0-100
+  * steps - Number of steps
+  * time  - Time in ms
 
 ## Contributing
+
+Any question? Did you found a bug? File an [issue](https://github.com/GPII/node-xbacklight/issues).
+
+Do you want to contribute with source code?
 
 1.  Fork the repository on Github
 2.  Create a named feature branch (like `add_component_x`)
 3.  Write your change
-4.  Submit a Pull Request using Github
+4.  Submit a pull request using Github
 

@@ -1,6 +1,10 @@
 /*
- * Copyright © 2007 Keith Packard
- * Copyright © 2015 Emergya
+ * Copyright 2007 Keith Packard
+ * Copyright 2015 Emergya
+ *
+ * The research leading to these results has received funding from the European
+ * Union's Seventh Framework Programme (FP7/2007-2013) under grant agreement
+ * n° 289016. More about Cloud4all: http://cloud4all.info
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that

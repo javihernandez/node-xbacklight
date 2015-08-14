@@ -1,3 +1,7 @@
+The research leading to these results has received funding from the European
+Union's Seventh Framework Programme (FP7/2007-2013) under grant agreement n°
+289016. More about Cloud4all: http://cloud4all.info
+
 Copyright (c) 2015, Emergya
 All rights reserved.
 

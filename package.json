@@ -5,16 +5,22 @@
   "homepage": "https://github.com/GPII/node-xbacklight",
   "repository": "git://github.com/GPII/node-xbacklight.git",
   "dependencies": {},
-  "license" : "BSD-3-Clause",
+  "devDependencies": {
+    "jqUnit": "git://github.com/fluid-project/node-jqUnit.git"
+  },
+  "license": "BSD-3-Clause",
   "keywords": [
-      "xbacklight",
-      "linux",
-      "brightness",
-      "configuration"
+    "xbacklight",
+    "linux",
+    "brightness",
+    "configuration"
   ],
   "main": "./build/Release/xbacklight.node",
   "scripts": {
-    "install": "node-gyp configure build"
+    "install": "node-gyp configure build",
+    "test": "node test/tests.js"
   },
-  "engines": { "node" : ">= 0.8.0" }
+  "engines": {
+    "node": ">= 0.8.0"
+  }
 }

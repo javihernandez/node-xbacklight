@@ -28,11 +28,32 @@
 
 using namespace v8;
 
+Handle<Value>
+_set_wrapper (op_t op, const Arguments& args)
+{
+    HandleScope scope;
+
+    int value = args[0]->ToNumber()->Value();
+    int steps = args[1]->ToNumber()->Value();
+    int time = args[2]->ToNumber()->Value();
+
+    // Set defaults when these come empty
+    if (!args[1]->IsNumber()) {
+        steps = 20;
+    }
+    if (!args[2]->IsNumber()) {
+        time = 200;
+    }
+
+    _xbacklight_set(op, value, steps, time);
+    return scope.Close(Boolean::New("True"));
+}
+
 /**
  * get:
  *
  * Takes no arguments
- * Returns: The value (0-100) representing the value of the current backlight
+ * Returns: The current backlight's percentage (0-100)
  */
 Handle<Value>
 get (const Arguments& args)
@@ -47,32 +68,45 @@ get (const Arguments& args)
  * set:
  *
  * Should take as arguments:
- *   value: New value 0-100
- *   steps: Number of steps in fade (Not implemented)
- *   time:  Fade time in milliseconds (Not implemented)
+ *   value: The desired percentage (0-100)
+ *   steps: Number of steps in fade
+ *   time:  Fade time in milliseconds
  * Returns: true
  */
 Handle<Value>
 set (const Arguments& args)
 {
-    HandleScope scope;
+    return _set_wrapper(Set, args);
+};
 
-    int value = args[0]->ToNumber()->Value();
-    int steps = args[1]->ToNumber()->Value();
-    int time = args[2]->ToNumber()->Value();
+/**
+ * inc:
+ *
+ * Should take as arguments:
+ *   value: Percentage to increase
+ *   steps: Number of steps in fade
+ *   time:  Fade time in milliseconds
+ * Returns: true
+ */
+Handle<Value>
+inc (const Arguments& args)
+{
+    return _set_wrapper(Inc, args);
+};
 
-    // Set defaults when these come empty
-    if (!args[1]->IsNumber()) {
-        steps = 1;
-    }
-
-    if (!args[2]->IsNumber()) {
-        time = 1;
-    }
-
-    _xbacklight_set(Set, value, steps, time);
-
-    return scope.Close(Boolean::New("True"));
+/**
+ * dec:
+ *
+ * Should take as arguments:
+ *   value: Percentage to decrease
+ *   steps: Number of steps in fade
+ *   time:  Fade time in milliseconds
+ * Returns: true
+ */
+Handle<Value>
+dec (const Arguments& args)
+{
+    return _set_wrapper(Dec, args);
 };
 
 void init(Handle<Object> target) {
@@ -80,6 +114,10 @@ void init(Handle<Object> target) {
                 FunctionTemplate::New(get)->GetFunction());
     target->Set(String::NewSymbol("set"),
                 FunctionTemplate::New(set)->GetFunction());
+    target->Set(String::NewSymbol("inc"),
+                FunctionTemplate::New(inc)->GetFunction());
+    target->Set(String::NewSymbol("dec"),
+                FunctionTemplate::New(dec)->GetFunction());
 }
 
 NODE_MODULE(xbacklight, init)

@@ -1,5 +1,6 @@
 /*
  * Copyright 2015 Emergya
+ * Copyright 2015 Raising the Floor
  *
  * The research leading to these results has received funding from the European
  * Union's Seventh Framework Programme (FP7/2007-2013) under grant agreement
@@ -25,32 +26,36 @@
  */
 
 
-#include <node.h>
-#include <v8.h>
+#include <nan.h>
 
 #include "xcb.h"
 
 using namespace v8;
+using v8::FunctionTemplate;
+using v8::Handle;
+using v8::Isolate;
+using v8::Object;
+using v8::String;
+using Nan::GetFunction;
+using Nan::New;
+using Nan::Set;
 
-Handle<Value>
-_set_wrapper (op_t op, const Arguments& args)
+void _set_wrapper (op_t op, const Nan::FunctionCallbackInfo<v8::Value>& info)
 {
-    HandleScope scope;
-
-    int value = args[0]->ToNumber()->Value();
-    int steps = args[1]->ToNumber()->Value();
-    int time = args[2]->ToNumber()->Value();
+    int value = info[0]->ToNumber()->Value();
+    int steps = info[1]->ToNumber()->Value();
+    int time = info[2]->ToNumber()->Value();
 
     // Set defaults when these come empty
-    if (!args[1]->IsNumber()) {
+    if (!info[1]->IsNumber()) {
         steps = 20;
     }
-    if (!args[2]->IsNumber()) {
+    if (!info[2]->IsNumber()) {
         time = 200;
     }
 
-    _xbacklight_set(op, value, steps, time);
-    return scope.Close(Boolean::New("True"));
+    _xbacklight_set(op, value, steps, time, info);
+    info.GetReturnValue().Set(Boolean::New(info.GetIsolate(), "True"));
 }
 
 /**
@@ -59,13 +64,11 @@ _set_wrapper (op_t op, const Arguments& args)
  * Takes no arguments
  * Returns: The current backlight's percentage (0-100)
  */
-Handle<Value>
-get (const Arguments& args)
+NAN_METHOD(get)
 {
-    HandleScope scope;
     int curr;
-    curr = _xbacklight_get();
-    return scope.Close(Number::New(curr));
+    curr = _xbacklight_get(info);
+    info.GetReturnValue().Set(Number::New(info.GetIsolate(), curr));
 };
 
 /**
@@ -77,10 +80,9 @@ get (const Arguments& args)
  *   time:  Fade time in milliseconds
  * Returns: true
  */
-Handle<Value>
-set (const Arguments& args)
+NAN_METHOD(set)
 {
-    return _set_wrapper(Set, args);
+    _set_wrapper(SetOp, info);
 };
 
 /**
@@ -92,10 +94,9 @@ set (const Arguments& args)
  *   time:  Fade time in milliseconds
  * Returns: true
  */
-Handle<Value>
-inc (const Arguments& args)
+NAN_METHOD(inc)
 {
-    return _set_wrapper(Inc, args);
+    _set_wrapper(IncOp, info);
 };
 
 /**
@@ -107,21 +108,20 @@ inc (const Arguments& args)
  *   time:  Fade time in milliseconds
  * Returns: true
  */
-Handle<Value>
-dec (const Arguments& args)
+NAN_METHOD(dec)
 {
-    return _set_wrapper(Dec, args);
+    _set_wrapper(DecOp, info);
 };
 
-void init(Handle<Object> target) {
-    target->Set(String::NewSymbol("get"),
-                FunctionTemplate::New(get)->GetFunction());
-    target->Set(String::NewSymbol("set"),
-                FunctionTemplate::New(set)->GetFunction());
-    target->Set(String::NewSymbol("inc"),
-                FunctionTemplate::New(inc)->GetFunction());
-    target->Set(String::NewSymbol("dec"),
-                FunctionTemplate::New(dec)->GetFunction());
+NAN_MODULE_INIT(init) {
+    Nan::Set(target, New<String>("get").ToLocalChecked(),
+        GetFunction(New<FunctionTemplate>(get)).ToLocalChecked());
+    Nan::Set(target, New<String>("set").ToLocalChecked(),
+        GetFunction(New<FunctionTemplate>(set)).ToLocalChecked());
+    Nan::Set(target, New<String>("inc").ToLocalChecked(),
+        GetFunction(New<FunctionTemplate>(inc)).ToLocalChecked());
+    Nan::Set(target, New<String>("dec").ToLocalChecked(),
+        GetFunction(New<FunctionTemplate>(dec)).ToLocalChecked());
 }
 
 NODE_MODULE(xbacklight, init)

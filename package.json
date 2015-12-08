@@ -6,7 +6,8 @@
   "repository": "git://github.com/GPII/node-xbacklight.git",
   "dependencies": {},
   "devDependencies": {
-    "jqUnit": "git://github.com/fluid-project/node-jqUnit.git"
+    "nan": "^2.1.0",
+    "node-jqunit": "1.1.0"
   },
   "license": "BSD-3-Clause",
   "keywords": [

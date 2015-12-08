@@ -39,11 +39,14 @@
 
 #include <iostream>
 #include <sstream>
-#include <node.h>
+#include <nan.h>
 
 #include "xcb.h"
 
 using namespace v8;
+using v8::Isolate;
+using v8::String;
+using Nan::ThrowError;
 
 static xcb_atom_t backlight, backlight_new, backlight_legacy;
 
@@ -66,8 +69,9 @@ typedef struct xcbData {
 } xcbData;
 
 xcbData
-_get_xcb_data () {
+_get_xcb_data (const Nan::FunctionCallbackInfo<v8::Value>& info) {
     xcbData data;
+    Isolate* isolate = info.GetIsolate();
 
     data.dpy_name = NULL;
 
@@ -80,8 +84,7 @@ _get_xcb_data () {
 
         err_msg << "RANDR Query Version returned error " << ec;
         std::string err_str = err_msg.str();
-        ThrowException(Exception::Error(
-            String::New(err_str.c_str())));
+        ThrowError(String::NewFromUtf8(isolate, err_str.c_str()));
     }
     if (data.ver_reply->major_version != 1 ||
 	data.ver_reply->minor_version < 2) {
@@ -90,8 +93,7 @@ _get_xcb_data () {
 
         err_msg << "RANDR version " << data.ver_reply->major_version << "." << data.ver_reply->minor_version << " too old.";
         std::string err_str = err_msg.str();
-        ThrowException(Exception::Error(
-            String::New(err_str.c_str())));
+        ThrowError(String::NewFromUtf8(isolate, err_str.c_str()));
     }
     free (data.ver_reply);
 
@@ -105,8 +107,7 @@ _get_xcb_data () {
 	int ec = data.error ? data.error->error_code : -1;
         err_msg << "Intern Atom returned error " << ec;
         std::string err_str = err_msg.str();
-        ThrowException(Exception::Error(
-            String::New(err_str.c_str())));
+        ThrowError(String::NewFromUtf8(isolate, err_str.c_str()));
     }
 
     backlight_new = data.backlight_reply->atom;
@@ -119,8 +120,7 @@ _get_xcb_data () {
 	int ec = data.error ? data.error->error_code : -1;
         err_msg << "Intern Atom returned error " << ec;
         std::string err_str = err_msg.str();
-        ThrowException(Exception::Error(
-            String::New(err_str.c_str())));
+        ThrowError(String::NewFromUtf8(isolate, err_str.c_str()));
     }
 
     backlight_legacy = data.backlight_reply->atom;
@@ -128,8 +128,7 @@ _get_xcb_data () {
 
     if (backlight_new == XCB_NONE && backlight_legacy == XCB_NONE) {
         std::string err_str ("No outputs have backlight property");
-        ThrowException(Exception::Error(
-            String::New(err_str.c_str())));
+        ThrowError(String::NewFromUtf8(isolate, err_str.c_str()));
     }
 
     data.iter = xcb_setup_roots_iterator (xcb_get_setup (data.conn));
@@ -187,12 +186,12 @@ backlight_set (xcb_connection_t *conn, xcb_randr_output_t output, long value)
 }
 
 int
-_xbacklight_set (op_t type, int value, int steps, int time) {
+_xbacklight_set (op_t type, int value, int steps, int time, const Nan::FunctionCallbackInfo<v8::Value>& info) {
     xcbData data;
     int i;
     int	total_time = 200; /* ms */
 
-    data = _get_xcb_data();
+    data = _get_xcb_data(info);
 
     while (data.iter.rem) {
         xcb_screen_t *screen = data.iter.data;
@@ -237,13 +236,13 @@ _xbacklight_set (op_t type, int value, int steps, int time) {
 
                     set = value * (max - min) / 100;
                     switch (type) {
-                    case Set:
+                    case SetOp:
                         new_value = min + set;
                         break;
-                    case Inc:
+                    case IncOp:
                         new_value = cur + set;
                         break;
-                    case Dec:
+                    case DecOp:
                         new_value = cur - set;
                         break;
                     default:
@@ -276,10 +275,10 @@ _xbacklight_set (op_t type, int value, int steps, int time) {
 }
 
 int
-_xbacklight_get () {
+_xbacklight_get (const Nan::FunctionCallbackInfo<v8::Value>& info) {
     xcbData data;
 
-    data = _get_xcb_data();
+    data = _get_xcb_data(info);
 
     while (data.iter.rem) {
         xcb_screen_t *screen = data.iter.data;
